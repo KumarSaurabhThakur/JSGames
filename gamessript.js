@@ -1,65 +1,136 @@
+"use strict";
+
 const canvas = document.querySelector("#canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-canvas.style.background = "aqua";
+//canvas.style.background = "aqua";
+
+canvas.style.backgroundImage = "url('sky.jpg')";
+canvas.style.backgroundSize = "cover";
 
 const context = canvas.getContext("2d");
 
+let offset = 0;
+
+let hillset = 0;
 
 //PLAYER CREATION
-let gravity = 1;
+let gravity = 0.8;
+
+let key = "";
 
 class player {
     constructor() {
         this.position = { x: 100, y: 100 };
         this.velocity = { x: 0, y: 1 };
-        this.position.width = 60;
-        this.position.height = 60;
+        this.position.width = 80;
+        this.position.height = 177;
+        this.frames = 1;
     }
 
+
     draw() {
-        context.fillStyle = "red";
-        context.fillRect(this.position.x, this.position.y, this.position.width, this.position.height);
+        if (this.velocity.y == 0 && this.velocity.x == 0) {
+            if (key == "right")
+                context.drawImage(marioStandingRight, 177 * this.frames, 0, 177, 400, this.position.x, this.position.y, this.position.width, this.position.height);
+            if (key == "left")
+                context.drawImage(marioStandingLeft, 177 * this.frames, 0, 177, 400, this.position.x, this.position.y, this.position.width, this.position.height);
+        }
+        if (this.velocity.x > 0)
+
+            context.drawImage(marioMovingRight, 340 * this.frames, 0, 340, 400, this.position.x, this.position.y, 155, 185);
+        if (this.velocity.x < 0)
+            context.drawImage(marioMovingLeft, 340 * this.frames, 0, 340, 400, this.position.x, this.position.y, 155, 185);
     }
 
     playerMovement() {
+        this.frames++;
+        if (this.frames > 24)
+            this.frames = 1;
+
         if ((this.position.height + this.position.y + this.velocity.y) >= canvas.height) {
             this.velocity.y = 0;
         }
         else {
             this.velocity.y += gravity;
         }
-        this.position.y += this.velocity.y;
+        //this.position.y += this.velocity.y;
 
         //Collision Detection
-        if ((this.position.x >= platform.x)
-            && (this.position.x <= (platform.position.x + platform.width))
-            && ((this.position.y+5) >= platform.position.y)
-            && (this.position.y <= (platform.position.y + 1))) {
-            this.velocity.y = 0;
+        for (let i = 0; i < platformsArray.length; i++) {
+
+            if (((this.position.x + this.position.width) >= platformsArray[i].position.x)
+                && (this.position.x <= (platformsArray[i].position.x + platformsArray[i].width))
+                && ((this.position.y + this.position.height + this.velocity.y) >= platformsArray[i].position.y)
+                && (this.position.y <= (platformsArray[i].position.y))) {
+                this.velocity.y = 0;
+
+            }
+
+
+            /*if ((this.position.x >= platformFigure2.position.x)
+                && (this.position.x <= (platformFigure2.position.x + platformFigure2.width))
+                && ((this.position.y + 40) >= platformFigure2.position.y)
+                && (this.position.y <= (platformFigure2.position.y))) {
+                this.velocity.y = 0;
+    
+            }*/
 
         }
 
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
+        this.draw();
     }
 }
+
+let marioStandingRight = new Image();
+marioStandingRight.src = "spriteStandRight.png";
+
+let marioStandingLeft = new Image();
+marioStandingLeft.src = "spriteStandLeft.png";
+
+let marioMovingRight = new Image();
+marioMovingRight.src = "spriteRunRight.png";
+
+let marioMovingLeft = new Image();
+marioMovingLeft.src = "spriteRunLeft.png";
+
 
 
 //PLAYER MOVEMENT
 addEventListener("keydown", function (e) {
     if (e.key === "ArrowRight") {
+        key = "right";
         playerFigure.velocity.x = 5;
-    }
-
-    else if (e.key === "ArrowUp") {
-        if (playerFigure.velocity.y === 0) {
-            playerFigure.velocity.y = -20;
+        if (playerFigure.position.x + playerFigure.position.width > 400) {
+            moveOffset(-5);
+            moveHills(-5);
         }
     }
 
+    else if (e.key === "ArrowUp") {
+        key = "up";
+        playerFigure.velocity.y = -25;
+        //splayerFigure.position.y-=8;
+        // if (
+        // \playerFigure.position.y + playerFigure.position.height > canvas.height - 5) {
+        //     playerFigure.velocity.y = -25;
+        // }
+        // if (playerFigure.position.y + playerFigure.position.height < platformFigure.height +5) {
+        //     playerFigure.velocity.y = -25;
+        // }
+    }
+
     else if (e.key === "ArrowLeft") {
-        playerFigure.velocity.x = -5;
+        key = "left";
+        if (playerFigure.position.x > 0) {
+            playerFigure.velocity.x = -5;
+        }
+        if (playerFigure.position.x + playerFigure.position.width > 400) {
+            moveOffset(5);
+            moveHills(5);
+        }
     }
 });
 
@@ -73,34 +144,86 @@ addEventListener("keyup", function (e) {
     }
 })
 
-const playerFigure = new player();
-
-
-
 //PLATFORMS CREATION
 class platform {
-    constructor() {
-        this.position = { x: 300, y: 400 };
-        this.width = 200;
-        this.height = 20;
+    constructor(x, y, width, height) {
+        this.position = { x: x, y: y, width: width, height: height };
+        this.width = width;
+        this.height = height;
     }
 
     draw() {
-        context.fillStyle = "blue";
-        context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        let platforms = new Image();
+        platforms.src = "platform.png";
+        context.drawImage(platforms, this.position.x, this.position.y, this.width, this.height);
     }
 
 }
 
-const platfromFigure = new platform();
+//HILLSclass hills {
+class hillsImages {
+    constructor() {
+        this.position = { x: 0, y: 100 };
+    }
+    hillsDraw() {
+        let hills = new Image();
+        hills.src = "hills.png";
+        context.drawImage(hills, this.position.x, this.position.y);
+
+    }
+
+}
+
+let hillsArray = [];
+const hillsFigure = new hillsImages();
+hillsArray.push(hillsFigure);
+
+let platformsArray = [];
+const platformFigure = new platform(0, 500, 800, 200);
+const platformFigure2 = new platform(platformFigure.width - 1, 500, 800, 200);
+const platformFigure3 = new platform(platformFigure.width * 2 - 2, 300, 800, 200);
+
+platformsArray.push(platformFigure);
+platformsArray.push(platformFigure2);
+platformsArray.push(platformFigure3);
+
+const playerFigure = new player();
+playerFigure.draw();
 //GAME ANIMATION
 function gameAnimation() {
     requestAnimationFrame(gameAnimation);
     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    /*platformFigure.draw();
+    platformFigure2.draw();*/
+
+    for (let i = 0; i < hillsArray.length; i++) {
+        hillsArray[i].hillsDraw();
+    }
+
+    for (let i = 0; i < platformsArray.length; i++) {
+        platformsArray[i].draw();
+    }
     playerFigure.playerMovement();
     playerFigure.draw();
-    platfromFigure.draw();
 
 }
+
+function moveOffset(x) {
+    offset += x;
+    for (let i = 0; i < platformsArray.length; i++) {
+        platformsArray[i].position.x += x;
+    }
+}
+
+function moveHills(a) {
+    hillset += a;
+    for (let i = 0; i < hillsArray.length; i++) {
+        hillsArray[i].position.x += a;
+    }
+}
+
+moveOffset(-5);
+moveHills(-5);
 
 gameAnimation();
