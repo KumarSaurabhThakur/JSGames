@@ -14,6 +14,8 @@ let offset = 0;
 
 let hillset = 0;
 
+let pitholesset = 0;
+
 //PLAYER CREATION
 let gravity = 0.8;
 
@@ -54,6 +56,10 @@ class player {
         else {
             this.velocity.y += gravity;
         }
+        //if(this.position.y=this.position.height==canvas.height){
+        //  alert("Game Over");
+        // window.location.reload
+        //  }
         //this.position.y += this.velocity.y;
 
         //Collision Detection
@@ -66,6 +72,16 @@ class player {
                 this.velocity.y = 0;
 
             }
+
+            /*for (let i = 0; i < pitholesArray.length; i++) {
+
+                if (((this.position.x + this.position.width) >= pitholesArray[i].position.x)
+                    && (this.position.x <= (pitholesArray[i].position.x + pitholesArray[i].width))
+                    && ((this.position.y + this.position.height + this.velocity.y) >= pitholesArray[i].position.y)
+                    && (this.position.y <= (pitholesArray[i].position.y))) {
+                    this.velocity.y = 0;
+
+                }*/
 
 
             /*if ((this.position.x >= platformFigure2.position.x)
@@ -83,6 +99,7 @@ class player {
         this.draw();
     }
 }
+
 
 let marioStandingRight = new Image();
 marioStandingRight.src = "spriteStandRight.png";
@@ -102,11 +119,14 @@ marioMovingLeft.src = "spriteRunLeft.png";
 addEventListener("keydown", function (e) {
     if (e.key === "ArrowRight") {
         key = "right";
-        playerFigure.velocity.x = 5;
-        if (playerFigure.position.x + playerFigure.position.width > 400) {
-            moveOffset(-5);
-            moveHills(-5);
+        playerFigure.velocity.x = 3;
+        if (playerFigure.position.x + playerFigure.position.width > 200) {
+            moveOffset(-20);
+            moveHills(-20);
+            movePitholes(-20);
         }
+        // if (playerFigure.position.x + playerFigure.position.width > 600)
+        //   playerFigure.position.x = 600;
     }
 
     else if (e.key === "ArrowUp") {
@@ -125,11 +145,12 @@ addEventListener("keydown", function (e) {
     else if (e.key === "ArrowLeft") {
         key = "left";
         if (playerFigure.position.x > 0) {
-            playerFigure.velocity.x = -5;
+            playerFigure.velocity.x = -3;
         }
         if (playerFigure.position.x + playerFigure.position.width > 400) {
-            moveOffset(5);
-            moveHills(5);
+            moveOffset(20);
+            moveHills(20);
+            movePitholes(20);
         }
     }
 });
@@ -160,6 +181,24 @@ class platform {
 
 }
 
+
+//PITHOLES CREATION
+class pitholes {
+    constructor(x, y, width, height) {
+        this.position = { x: x, y: y, width: width, height: height };
+        this.width = width;
+        this.height = height;
+    }
+
+    draw() {
+        let platforms = new Image();
+        platforms.src = "platformSmallTall.png";
+        context.drawImage(platforms, this.position.x, this.position.y, this.width, this.height);
+    }
+
+}
+
+
 //HILLSclass hills {
 class hillsImages {
     constructor() {
@@ -181,11 +220,16 @@ hillsArray.push(hillsFigure);
 let platformsArray = [];
 const platformFigure = new platform(0, 500, 800, 200);
 const platformFigure2 = new platform(platformFigure.width - 1, 500, 800, 200);
-const platformFigure3 = new platform(platformFigure.width * 2 - 2, 300, 800, 200);
+const platformFigure3 = new platform(platformFigure.width * 2 - 2, 500, 800, 200);
 
 platformsArray.push(platformFigure);
 platformsArray.push(platformFigure2);
 platformsArray.push(platformFigure3);
+
+let pitholesArray = [];
+const pitholesFigure = new pitholes(platformFigure.width * 3 + 80, 400, 400, 400);
+
+pitholesArray.push(pitholesFigure);
 
 const playerFigure = new player();
 playerFigure.draw();
@@ -204,6 +248,11 @@ function gameAnimation() {
     for (let i = 0; i < platformsArray.length; i++) {
         platformsArray[i].draw();
     }
+
+    for (let i = 0; i < pitholesArray.length; i++) {
+        pitholesArray[i].draw();
+    }
+
     playerFigure.playerMovement();
     playerFigure.draw();
 
@@ -223,7 +272,14 @@ function moveHills(a) {
     }
 }
 
-moveOffset(-5);
-moveHills(-5);
+function movePitholes(a) {
+    pitholesset += a;
+    for (let i = 0; i < pitholesArray.length; i++) {
+        pitholesArray[i].position.x += a;
+    }
+}
 
+moveHills(-20);
+moveOffset(-20);
+movePitholes(-20);
 gameAnimation();
