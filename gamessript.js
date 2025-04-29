@@ -73,6 +73,10 @@ class player {
 
             }
 
+            /*if ((this.position.x + this.position.width) == platformsArray[i].x
+                && (this.position.y + this.position.height) == canvas.height)
+                this.velocity.x = 0;*/
+
             /*for (let i = 0; i < pitholesArray.length; i++) {
 
                 if (((this.position.x + this.position.width) >= pitholesArray[i].position.x)
@@ -121,9 +125,9 @@ addEventListener("keydown", function (e) {
         key = "right";
         playerFigure.velocity.x = 3;
         if (playerFigure.position.x + playerFigure.position.width > 400) {
-            moveOffset(-20);
-            moveHills(-20);
-            movePitholes(-20);
+            moveOffset(-15);
+            moveHills(-15);
+            //movePitholes(-15);
         }
         if (playerFigure.position.x + playerFigure.position.width > 600)
             playerFigure.position.x = 600;
@@ -148,9 +152,9 @@ addEventListener("keydown", function (e) {
             playerFigure.velocity.x = -3;
         }
         if (playerFigure.position.x + playerFigure.position.width <= 400) {
-            moveOffset(20);
-            moveHills(20);
-            movePitholes(20);
+            moveOffset(15);
+            moveHills(15);
+            // movePitholes(15);
         }
     }
 });
@@ -183,7 +187,7 @@ class platform {
 
 
 //PITHOLES CREATION
-class pitholes {
+/*class pitholes {
     constructor(x, y, width, height) {
         this.position = { x: x, y: y, width: width, height: height };
         this.width = width;
@@ -196,7 +200,7 @@ class pitholes {
         context.drawImage(platforms, this.position.x, this.position.y, this.width, this.height);
     }
 
-}
+}*/
 
 
 //HILLSclass hills {
@@ -221,15 +225,21 @@ let platformsArray = [];
 const platformFigure = new platform(0, 500, 800, 200);
 const platformFigure2 = new platform(platformFigure.width - 1, 500, 800, 200);
 const platformFigure3 = new platform(platformFigure.width * 2 - 2, 500, 800, 200);
+const platformFigure4 = new platform(platformFigure.width * 3 + 100, 450, 800, 200);
+const platformFigure5 = new platform(platformFigure.width * 4 + 200, 350, 800, 200);
+const platformFigure6 = new platform(platformFigure.width * 5 + 400, 500, 800, 200);
 
 platformsArray.push(platformFigure);
 platformsArray.push(platformFigure2);
 platformsArray.push(platformFigure3);
+platformsArray.push(platformFigure4);
+platformsArray.push(platformFigure5);
+platformsArray.push(platformFigure6);
 
-let pitholesArray = [];
+/*let pitholesArray = [];
 const pitholesFigure = new pitholes(platformFigure.width * 3 + 80, 400, 400, 400);
 
-pitholesArray.push(pitholesFigure);
+pitholesArray.push(pitholesFigure);*/
 
 const playerFigure = new player();
 playerFigure.draw();
@@ -249,9 +259,9 @@ function gameAnimation() {
         platformsArray[i].draw();
     }
 
-    for (let i = 0; i < pitholesArray.length; i++) {
+    /*for (let i = 0; i < pitholesArray.length; i++) {
         pitholesArray[i].draw();
-    }
+    }*/
 
     playerFigure.playerMovement();
     playerFigure.draw();
@@ -272,15 +282,27 @@ function moveHills(a) {
     }
 }
 
-function movePitholes(a) {
+/*function movePitholes(a) {
     pitholesset += a;
     for (let i = 0; i < pitholesArray.length; i++) {
         pitholesArray[i].position.x += a;
     }
-}
+}*/
 
-moveHills(-20);
-moveOffset(-20);
-movePitholes(-20);
-
+moveHills(-15);
+moveOffset(-15);
+//movePitholes(-15);
+Promise.all(Array.from(document.images).map(img => {
+    if (img.complete)
+        return Promise.resolve(img.naturalHeight !== 0);
+    return new Promise(resolve => {
+        img.addEventListener('load', () => resolve(true));
+        img.addEventListener('error', () => resolve(false));
+    });
+})).then(results => {
+    if (results.every(res => res))
+        console.log('all images loaded successfully');
+    else
+        console.log('some images failed to load, all finished loading');
+});
 gameAnimation();
