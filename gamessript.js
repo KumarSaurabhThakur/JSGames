@@ -120,13 +120,13 @@ addEventListener("keydown", function (e) {
     if (e.key === "ArrowRight") {
         key = "right";
         playerFigure.velocity.x = 3;
-        if (playerFigure.position.x + playerFigure.position.width > 200) {
+        if (playerFigure.position.x + playerFigure.position.width > 400) {
             moveOffset(-20);
             moveHills(-20);
             movePitholes(-20);
         }
-        // if (playerFigure.position.x + playerFigure.position.width > 600)
-        //   playerFigure.position.x = 600;
+        if (playerFigure.position.x + playerFigure.position.width > 600)
+            playerFigure.position.x = 600;
     }
 
     else if (e.key === "ArrowUp") {
@@ -147,7 +147,7 @@ addEventListener("keydown", function (e) {
         if (playerFigure.position.x > 0) {
             playerFigure.velocity.x = -3;
         }
-        if (playerFigure.position.x + playerFigure.position.width > 400) {
+        if (playerFigure.position.x + playerFigure.position.width <= 400) {
             moveOffset(20);
             moveHills(20);
             movePitholes(20);
@@ -282,4 +282,5 @@ function movePitholes(a) {
 moveHills(-20);
 moveOffset(-20);
 movePitholes(-20);
+
 gameAnimation();
